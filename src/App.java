@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -38,25 +37,19 @@ public class App {
 
     //exibir e manipular os dados
       var gerador = new GeradorDeFigurinhas();
-    for ( Map<String, String> filme : listaDeFilmes ) {
+    for ( int i = 0; i < 10; i++) {
+      Map<String, String> filme = listaDeFilmes.get(i);
 
-      String urlImagem = filme.get("image");
+      String urlImagem = filme.get("image").replace("((@+)(.*).jpg$", "$1.jpg");
       String titulo = filme.get("title");
 
       InputStream inputStream = new URL(urlImagem).openStream();
-      String nomeArquivo = titulo + ".png";
+      String nomeArquivo = "saida/" + titulo + ".png";
 
       gerador.cria(inputStream, nomeArquivo);
 
       System.out.println(titulo);
       System.out.println();
     }
-
-//    for ( Map<String, String> filme : maisPopulares ) {
-//      System.out.println("Mais Populares Abaixo");
-//      System.out.println(filme.get("title"));
-//      System.out.println(filme.get("image"));
-//      System.out.println(filme.get("imDbRating"));
-//    }
   }
 }
