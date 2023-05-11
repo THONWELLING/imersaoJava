@@ -1,53 +1,34 @@
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.Map;
 
 public class App {
   public static void main(String[] args) throws Exception {
     System.out.println("Hello World!!!");
 
-    //fazer um conexão http e buscar os top 250 filmes
-    String url = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/TopMovies.json";
-
+    String url = "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2022-06-12&end_date=2022-06-14";
+    ExtratorDeConteudo extrator = new ExtratorDeConteudosDaNasa();
 
     var http = new ClienteHttp();
     String json = http.buscaDados(url);
 
-   /* //Pegar os mais populares
-    String urlMostPopular = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/MostPopularMovies.json";
-    URI enderecoMostPopular = URI.create(urlMostPopular);
-    HttpClient client1 = HttpClient.newHttpClient();
-    HttpRequest requisicao = HttpRequest.newBuilder(enderecoMostPopular).GET().build();
-    HttpResponse<String> resposta = client1.send(requisicao, HttpResponse.BodyHandlers.ofString());
-    String corpo = resposta.body();
-  */
+    List<Conteudo> conteudos = extrator.extraiConteudos(json);
 
-    //extrair só os dados que interessam (titulo,  poster, classificação)
-    var parser = new JsonParser();
-    List<Map<String, String>> listaDeConteudos = parser.parse(json);
+    /*
+      String url = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/MostPopularMovies.json";
+      ExtratorDeConteudo extrator = new ExtratorDeConteudosDoIMDB();
+   */
 
-    List<Map<String, String>> maisPopulares = parser.parse(json);
-
-
-    //exibir e manipular os dados
       var gerador = new GeradorDeFigurinhas();
-    for ( int i = 0; i < 10; i++) {
-      Map<String, String> conteudo = listaDeConteudos.get(i);
+    for ( int i = 0; i < 3; i++) {
+      Conteudo conteudo = conteudos.get(i);
 
-      String urlImagem = conteudo.get("image").replace("((@+)(.*).jpg$", "$1.jpg");
-      String titulo = conteudo.get("title");
-
-      InputStream inputStream = new URL(urlImagem).openStream();
-      String nomeArquivo = "saida/" + titulo + ".png";
+      InputStream inputStream = new URL(conteudo.getUrlImagem()).openStream();
+      String nomeArquivo = "saida/" + conteudo.getTitulo() + ".png";
 
       gerador.cria(inputStream, nomeArquivo);
 
-      System.out.println(titulo);
+      System.out.println(conteudo.getTitulo());
       System.out.println();
     }
   }
